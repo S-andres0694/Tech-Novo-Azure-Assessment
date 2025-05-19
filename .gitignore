@@ -7,3 +7,6 @@
 
 # ESLint
 eslint-results.sarif
+
+# Jest
+coverage/
