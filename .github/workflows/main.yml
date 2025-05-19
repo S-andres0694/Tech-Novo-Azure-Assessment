@@ -1,4 +1,4 @@
-name: ESLint Check
+name: Code Health
 
 on:
   push:
@@ -68,7 +68,10 @@ jobs:
           pnpx jest --coverage --coverageReporters json-summary
 
       - name: Jest Coverage Comment
-        uses: MishaKav/jest-coverage-comment@main
+        uses: ArtiomTr/jest-coverage-report-action@v2
+        with:
+          test-script: pnpm jest
+          coverage-file: coverage/coverage-summary.json
 
   build:
     name: Build
