@@ -1,11 +1,49 @@
-            - name: ESLint Report
-  # You may pin to the exact commit or the version.
-  # uses: ldiego73/eslint-report-action@ee6afa28bdcb5434f66336ed79247b78ea325828
-  uses: ldiego73/eslint-report-action@v1.1
-  with:
-    # Github Token
-    token: # default is ${{ github.token }}
-    # The path to the ESLint report JSON file
-    report: # default is reports/lint.json
-    fail-on-warning: true
-          
+name: ESLint Check
+
+on:
+  push:
+    branches: ["**"]
+  pull_request:
+    branches: ["**"]
+
+jobs:
+  lint:
+    name: Run ESLint
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write # Required for SARIF upload
+      actions: read # Required for a step below
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: latest # You can pin this to a specific pnpm version if needed
+      - name: Install dependencies
+        run: pnpm install
+      - name: Run ESLint
+        id: eslint
+        # Run ESLint and output to SARIF format.
+        # Continue on error so we can upload SARIF results regardless of lint issues.
+        run: pnpm exec eslint . --format=sarif --output-file=eslint-results.sarif
+        continue-on-error: true
+      - name: Upload ESLint results to GitHub
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: eslint-results.sarif
+          # Optional: Category for the analysis if you have multiple SARIF uploads
+          # category: eslint
+        # Only run this step if the ESLint step ran (even if it had errors)
+        if: always()
+
+      - name: Check ESLint conclusion
+        if: steps.eslint.outcome == 'failure'
+        run: |
+          echo "ESLint found issues. See the 'Security' tab or PR checks for details."
+          exit 1

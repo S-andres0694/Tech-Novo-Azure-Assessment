@@ -1,10 +1,9 @@
 import js from "@eslint/js";
 import globals from "globals";
 import tseslint from "typescript-eslint";
-import pluginReact from "eslint-plugin-react";
 import { defineConfig } from "eslint/config";
 import eslintConfigPrettier from "eslint-config-prettier";
-
+import pluginReact from "eslint-plugin-react";
 export default defineConfig([
   {
     files: ["**/*.{js,mjs,cjs,ts,jsx,tsx}"],
@@ -20,6 +19,9 @@ export default defineConfig([
   tseslint.configs.recommended,
   {
     ...pluginReact.configs.flat.recommended,
+    rules: {
+      "react/react-in-jsx-scope": "off", // Avoids issues with the linter because I am using React 19.1.0
+    },
     settings: {
       react: {
         version: "19.1.0",
