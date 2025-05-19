@@ -24,20 +24,18 @@ jobs:
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: latest # You can pin this to a specific pnpm version if needed
+          version: latest
       - name: Install dependencies
         run: pnpm install
       - name: Run ESLint
         id: eslint
         # Run ESLint and output to SARIF format.
-        # Continue on error so we can upload SARIF results regardless of lint issues.
-        run: pnpm exec eslint . --format=sarif --output-file=eslint-results.sarif
+        run: pnpm exec eslint -f @microsoft/eslint-formatter-sarif -o eslint-results.sarif
         continue-on-error: true
       - name: Upload ESLint results to GitHub
         uses: github/codeql-action/upload-sarif@v3
         with:
           sarif_file: eslint-results.sarif
-          # Optional: Category for the analysis if you have multiple SARIF uploads
           # category: eslint
         # Only run this step if the ESLint step ran (even if it had errors)
         if: always()
