@@ -1,0 +1,11 @@
+            - name: ESLint Report
+  # You may pin to the exact commit or the version.
+  # uses: ldiego73/eslint-report-action@ee6afa28bdcb5434f66336ed79247b78ea325828
+  uses: ldiego73/eslint-report-action@v1.1
+  with:
+    # Github Token
+    token: # default is ${{ github.token }}
+    # The path to the ESLint report JSON file
+    report: # default is reports/lint.json
+    fail-on-warning: true
+          
