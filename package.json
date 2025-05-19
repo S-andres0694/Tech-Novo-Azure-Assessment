@@ -7,6 +7,7 @@
     "dev": "react-router dev",
     "start": "react-router-serve ./build/server/index.js",
     "typecheck": "react-router typegen && tsc",
+    "lint": "eslint --fix",
     "prepare": "husky"
   },
   "dependencies": {
@@ -51,6 +52,6 @@
   },
   "lint-staged": {
     "**/*": "prettier --write --ignore-unknown",
-    "**/*.{js,jsx,ts,tsx}": "eslint --fix"
+    "*.{js,jsx,ts,tsx}": "eslint --fix"
   }
 }
