@@ -24,5 +24,5 @@ fi
 echo "Environment variables loaded successfully"
 
 # Load the database container.
-docker run --name drizzle-postgres -e POSTGRES_PASSWORD=$POSTGRES_DATABASE_PASSWORD -d -p 5432:5432 postgres
+docker run --name drizzle-postgres -e POSTGRES_PASSWORD=$POSTGRES_DATABASE_PASSWORD -d -p $DATABASE_PORT:5432 -v drizzle-postgres-data:/var/lib/postgresql/data postgres
 
