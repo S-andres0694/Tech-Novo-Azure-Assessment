@@ -1,13 +1,7 @@
+import { users } from "~/database/schema";
+
 // User object at the time of registration
-export type User = {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  createdAt: Date;
-  updatedAt: Date;
-  festivalsIDs: string[];
-};
+export type User = typeof users.$inferSelect;
 
 // User object at the time of login
 export type UserLogin = {

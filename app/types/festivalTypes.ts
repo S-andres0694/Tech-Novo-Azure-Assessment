@@ -1,4 +1,3 @@
-import type { InferSelectModel } from "drizzle-orm";
 import type {
   address,
   festival,
@@ -10,10 +9,10 @@ import type {
 } from "~/database/schema";
 
 // The type describing the festival configuration based on the spec
-export type Festival = InferSelectModel<typeof festival>;
+export type Festival = typeof festival.$inferSelect;
 
 // The type describing the venue configuration
-export type Venue = InferSelectModel<typeof venue>;
+export type Venue = typeof venue.$inferSelect;
 
 // Bathrooms in the venue.
 // Bathrooms in the venue.
@@ -23,16 +22,16 @@ export type Toilet = {
 };
 
 // Address of the venue
-export type Address = InferSelectModel<typeof address>;
+export type Address = typeof address.$inferSelect;
 
 // Weather configuration
-export type Weather = InferSelectModel<typeof weather>;
+export type Weather = typeof weather.$inferSelect;
 
 // Temperature based in Celsius to then be converted to Fahrenheit
-export type Temperature = InferSelectModel<typeof temperature>;
+export type Temperature = typeof temperature.$inferSelect;
 
 // Determines the wind for the weather conditions
-export type Wind = InferSelectModel<typeof wind>;
+export type Wind = typeof wind.$inferSelect;
 
 // Summary of the weather conditions to employ on the client.
 export type WeatherCondition = {
@@ -70,7 +69,7 @@ export type WeatherRequestParameterLocation = {
 };
 
 // Vendors for the festival
-export type Vendor = InferSelectModel<typeof vendors>;
+export type Vendor = typeof vendors.$inferSelect;
 
 // Artist for the festival
 export type Artist = {
