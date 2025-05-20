@@ -14,4 +14,6 @@ export default defineConfig({
   dbCredentials: {
     url: getPostgresURL(PASSWORD, parseInt(PORT)),
   },
+  verbose: true,
+  strict: true,
 });

@@ -1,17 +1,19 @@
+import { relations } from "drizzle-orm";
 import {
-  pgTable,
-  integer,
-  text,
-  varchar,
-  timestamp,
-  PgTable,
-  boolean,
-  jsonb,
+    pgTable,
+    integer,
+    varchar,
+    timestamp,
+    PgTable,
+    boolean,
+    jsonb,
+    primaryKey,
 } from "drizzle-orm/pg-core";
+import type { Artist } from "~/types/festivalTypes";
 
 // Make sure to import the constants when building the client. 
 export const CONSTANTS = {
-  MAX_ADDRESS_LENGTH: 255,
+    MAX_ADDRESS_LENGTH: 255,
     MAX_VENUE_NAME_LENGTH: 255,
     MAX_BATHROOM_TYPE_LENGTH: 20,
     MAX_WEATHER_LOCATION_NAME_LENGTH: 255,
@@ -36,35 +38,39 @@ export const CONSTANTS = {
 
 // Table for the festival event
 export const festival: PgTable = pgTable("festival", {
-  id: integer("id").primaryKey(),
-  name: varchar("name", { length: CONSTANTS.MAX_FESTIVAL_NAME_LENGTH }).notNull(),
-  description: varchar("description", { length: CONSTANTS.MAX_FESTIVAL_DESCRIPTION_LENGTH }).notNull(),
-  startDate: timestamp("start_date").notNull(),
+    id: integer("id").primaryKey(),
+    name: varchar("name", { length: CONSTANTS.MAX_FESTIVAL_NAME_LENGTH }).notNull(),
+    description: varchar("description", { length: CONSTANTS.MAX_FESTIVAL_DESCRIPTION_LENGTH }).notNull(),
+    startDate: timestamp("start_date").notNull(),
     endDate: timestamp("end_date").notNull(),
-  // @ts-expect-error - Not sure how to parameterize the venue table as a generic type of the pgTable type
-  venueId: integer("venue_id").references(() => venue.id).notNull(),
-  // @ts-expect-error - Not sure how to parameterize the address table as a generic type of the pgTable type
-  addressId: integer("address_id").references(() => address.id).notNull(),
-  // @ts-expect-error - Not sure how to parameterize the weather table as a generic type of the pgTable type
+    // @ts-expect-error - Not sure how to parameterize the venue table as a generic type of the pgTable type
+    venueId: integer("venue_id").references(() => venue.id).notNull(),
+    // @ts-expect-error - Not sure how to parameterize the address table as a generic type of the pgTable type
+    addressId: integer("address_id").references(() => address.id).notNull(),
+    // @ts-expect-error - Not sure how to parameterize the weather table as a generic type of the pgTable type
     weatherId: integer("weather_id").references(() => weather.id).notNull(),
-  // @ts-expect-error - Not sure how to parameterize the users table as a generic type of the pgTable type
+    // @ts-expect-error - Not sure how to parameterize the users table as a generic type of the pgTable type
     userId: integer("user_id").references(() => users.id).notNull(),
-  artistsIds: jsonb("artists").array(),
+    artists: jsonb("artists_data").$type<Artist[]>().default([]).array(), // Renamed for clarity, stores array of Artist objects
 });
 
 // Table for the venue
 export const venue: PgTable = pgTable("venue", {
-  id: integer("id").primaryKey(),
-  name: varchar("name", { length: CONSTANTS.MAX_VENUE_NAME_LENGTH }).notNull(),
-  // @ts-expect-error - Not sure how to parameterize the address table as a generic type of the pgTable type
-  addressId: integer("address_id").references(() => address.id).notNull(),
-  capacity: integer("capacity").notNull(),
-  medicalTents: jsonb("medical_tents"),
-  campingAreas: jsonb("camping_areas"),
-  toilets: jsonb("toilets"),
-  security: integer("security").notNull(),
-  isOutdoors: boolean("is_outdoors").notNull(),
+    id: integer("id").primaryKey(),
+    name: varchar("name", { length: CONSTANTS.MAX_VENUE_NAME_LENGTH }).notNull(),
+    // @ts-expect-error - Not sure how to parameterize the address table as a generic type of the pgTable type
+    addressId: integer("address_id").references(() => address.id).notNull(),
+    capacity: integer("capacity").notNull(),
+    medicalTents: jsonb("medical_tents"),
+    campingAreas: jsonb("camping_areas"),
+    toilets: jsonb("toilets"),
+    security: integer("security").notNull(),
+    isOutdoors: boolean("is_outdoors").notNull(),
 });
+
+export const festivalToVendors = relations(festival, ({ many }) => ({
+    vendors: many(vendors),
+}));
 
 // Table for the venue address
 export const address: PgTable = pgTable("address", {
@@ -112,33 +118,56 @@ export const weatherResponseForecast: PgTable = pgTable("weather_response_foreca
 
 // Table for the temperature at the event
 export const temperature: PgTable = pgTable("temperature", {
-  id: integer("id").primaryKey(),
-  celsius: integer("celsius"),
-  fahrenheit: integer("fahrenheit"),
-}); 
+    id: integer("id").primaryKey(),
+    celsius: integer("celsius"),
+    fahrenheit: integer("fahrenheit"),
+});
 
 // Table for the wind of the weather
 export const wind: PgTable = pgTable("wind", {
     id: integer("id").primaryKey(),
-  kilometerPerHour: integer("kph"),
-  milesPerHour: integer("mph"),
-}) 
+    kilometerPerHour: integer("kph"),
+    milesPerHour: integer("mph"),
+})
 
 // Table for the vendors that are going to be in the event.
 export const vendors: PgTable = pgTable("vendors", {
-  id: integer("id").primaryKey(),
-  name: varchar("name", { length: CONSTANTS.MAX_VENDORS_NAME_LENGTH }).notNull(),
-  type: varchar("type", { length: CONSTANTS.MAX_VENDORS_TYPE_LENGTH }).notNull(),
+    id: integer("id").primaryKey(),
+    name: varchar("name", { length: CONSTANTS.MAX_VENDORS_NAME_LENGTH }).notNull(),
+    type: varchar("type", { length: CONSTANTS.MAX_VENDORS_TYPE_LENGTH }).notNull(),
 });
-
 
 // Table for the users of the application
 export const users: PgTable = pgTable("users", {
-  id: integer("id").primaryKey(),
-  name: varchar("name", { length: CONSTANTS.MAX_USERS_NAME_LENGTH }).notNull(),
-  email: varchar("email", { length: CONSTANTS.MAX_USERS_EMAIL_LENGTH }).notNull(),
-  password: varchar("password", { length: CONSTANTS.MAX_USERS_PASSWORD_LENGTH }).notNull(), // Stores the encrypted password so it should be a considerable length.
-  createdAt: timestamp("created_at").notNull(),
-  updatedAt: timestamp("updated_at").notNull(),
-  festivalsIDs: text("festivals_ids").array(),
+    id: integer("id").primaryKey(),
+    name: varchar("name", { length: CONSTANTS.MAX_USERS_NAME_LENGTH }).notNull(),
+    email: varchar("email", { length: CONSTANTS.MAX_USERS_EMAIL_LENGTH }).notNull(),
+    password: varchar("password", { length: CONSTANTS.MAX_USERS_PASSWORD_LENGTH }).notNull(), // Stores the encrypted password so it should be a considerable length.
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+    updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
 });
+
+export const usersToFestivals = pgTable('users_to_festivals', {
+    // @ts-expect-error - Not sure how to parameterize the users table as a generic type of the pgTable type
+    userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
+    // @ts-expect-error - Not sure how to parameterize the festival table as a generic type of the pgTable type
+    festivalId: integer('festival_id').notNull().references(() => festival.id, { onDelete: 'cascade' }),
+}, (t) => ([
+    primaryKey({ columns: [t.userId, t.festivalId] }), // Composite primary key
+])
+);
+
+export const usersRelations = relations(users, ({ many }) => ({
+    festivals: many(usersToFestivals),
+}));
+
+export const festivalRelations = relations(festival, ({ one }) => ({
+    // @ts-expect-error - Not sure how to parameterize the venue table as a generic type of the pgTable type
+    venue: one(venue, { fields: [festival.venueId], references: [venue.id] }),
+    // @ts-expect-error - Not sure how to parameterize the address table as a generic type of the pgTable type
+    address: one(address, { fields: [festival.addressId], references: [address.id] }),
+    // @ts-expect-error - Not sure how to parameterize the weather table as a generic type of the pgTable type
+    weather: one(weather, { fields: [festival.weatherId], references: [weather.id] }),
+    // @ts-expect-error - Not sure how to parameterize the users table as a generic type of the pgTable type
+    organizer: one(users, { fields: [festival.userId], references: [users.id] }), // Assuming festival.userId is the organizer
+}));
