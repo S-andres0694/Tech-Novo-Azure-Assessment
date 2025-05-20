@@ -6,6 +6,7 @@ export type User = {
   password: string;
   createdAt: Date;
   updatedAt: Date;
+  festivalsIDs: string[];
 };
 
 // User object at the time of login

@@ -1,85 +1,38 @@
+import type { InferSelectModel } from "drizzle-orm";
+import type {
+  address,
+  festival,
+  temperature,
+  toilets,
+  vendors,
+  venue,
+  weather,
+  wind,
+} from "~/database/schema";
+
 // The type describing the festival configuration based on the spec
-export type Festival = {
-  name: string;
-  startDate: Date;
-  endDate: Date;
-  venue: Venue;
-  address: Address;
-  weather: Weather;
-  artists: Artist[];
-};
+export type Festival = InferSelectModel<typeof festival>;
 
 // The type describing the venue configuration
-type Venue = {
-  name: string;
-  address: Address;
-  capacity: number;
-  toilets: Toilet[];
-  medicalTents: {
-    hasMedicalTent: boolean;
-    quantity: number | null;
-  };
-  campingAreas: {
-    hasCampingArea: boolean;
-    quantity: number | null;
-  };
-  security: 1 | 2 | 3 | null; // Security level of the venue in a scale of 1-3
-  isOutdoors: boolean;
-  vendors: Vendor[];
-};
+export type Venue = InferSelectModel<typeof venue>;
 
 // Bathrooms in the venue.
-type Toilet = {
-  hasToilet: boolean;
-  type: "porta-potty" | "flush-toilet" | "dedicated-bathroom" | null;
-};
+export type Toilet = InferSelectModel<typeof toilets>;
 
 // Address of the venue
-type Address = {
-  street: string;
-  city: string;
-  state: string;
-  zip: string | number;
-  region: string;
-  country: string;
-};
+export type Address = InferSelectModel<typeof address>;
 
 // Weather configuration
-type Weather = {
-  location: {
-    name: string;
-    region: string;
-    country: string;
-    latitude: number;
-    longitude: number;
-    localTime: string;
-  };
-  forecast: {
-    date: Date;
-    avgTemp: Temperature;
-    avgWind: Wind;
-    precipitationInches: number;
-    avgHumidity: number;
-    condition: WeatherCondition;
-    willItRain: number;
-    willItSnow: number;
-  };
-};
+export type Weather = InferSelectModel<typeof weather>;
 
 // Temperature based in Celsius to then be converted to Fahrenheit
-type Temperature = {
-  celsius: number;
-  fahrenheit: number;
-};
+export type Temperature = InferSelectModel<typeof temperature>;
 
 // Determines the wind for the weather conditions
-type Wind = {
-  kilometerPerHour: number;
-  milesPerHour: number;
-};
+export type Wind = InferSelectModel<typeof wind>;
 
 // Summary of the weather conditions to employ on the client.
-type WeatherCondition = {
+export type WeatherCondition = {
   description: string;
   icon: URL;
 };
@@ -102,7 +55,7 @@ export interface DefaultWeatherRequest extends WeatherRequest {
 }
 
 // Identifier for the location of the weather requests
-type WeatherRequestParameterLocation = {
+export type WeatherRequestParameterLocation = {
   usZipCode?: string;
   ukZipCode?: string;
   canadaPostalCode?: string;
@@ -114,13 +67,10 @@ type WeatherRequestParameterLocation = {
 };
 
 // Vendors for the festival
-type Vendor = {
-  name: string;
-  type: "food" | "drink" | "merchandise" | "other";
-};
+export type Vendor = InferSelectModel<typeof vendors>;
 
 // Artist for the festival
-type Artist = {
+export type Artist = {
   name: string;
   id: string;
   genres: string[];
