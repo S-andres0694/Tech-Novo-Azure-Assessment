@@ -15,4 +15,5 @@ spec.md
 
 .env
 
-drizzle
+drizzle/meta
+drizzle/.env

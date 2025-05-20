@@ -4,7 +4,6 @@ import {
     integer,
     varchar,
     timestamp,
-    PgTable,
     boolean,
     jsonb,
     primaryKey,
@@ -37,28 +36,23 @@ export const CONSTANTS = {
  */
 
 // Table for the festival event
-export const festival: PgTable = pgTable("festival", {
+export const festival = pgTable("festival", {
     id: integer("id").primaryKey(),
     name: varchar("name", { length: CONSTANTS.MAX_FESTIVAL_NAME_LENGTH }).notNull(),
     description: varchar("description", { length: CONSTANTS.MAX_FESTIVAL_DESCRIPTION_LENGTH }).notNull(),
     startDate: timestamp("start_date").notNull(),
     endDate: timestamp("end_date").notNull(),
-    // @ts-expect-error - Not sure how to parameterize the venue table as a generic type of the pgTable type
     venueId: integer("venue_id").references(() => venue.id).notNull(),
-    // @ts-expect-error - Not sure how to parameterize the address table as a generic type of the pgTable type
     addressId: integer("address_id").references(() => address.id).notNull(),
-    // @ts-expect-error - Not sure how to parameterize the weather table as a generic type of the pgTable type
     weatherId: integer("weather_id").references(() => weather.id).notNull(),
-    // @ts-expect-error - Not sure how to parameterize the users table as a generic type of the pgTable type
     userId: integer("user_id").references(() => users.id).notNull(),
     artists: jsonb("artists_data").$type<Artist[]>().default([]).array(), // Renamed for clarity, stores array of Artist objects
 });
 
 // Table for the venue
-export const venue: PgTable = pgTable("venue", {
+export const venue = pgTable("venue", {
     id: integer("id").primaryKey(),
     name: varchar("name", { length: CONSTANTS.MAX_VENUE_NAME_LENGTH }).notNull(),
-    // @ts-expect-error - Not sure how to parameterize the address table as a generic type of the pgTable type
     addressId: integer("address_id").references(() => address.id).notNull(),
     capacity: integer("capacity").notNull(),
     medicalTents: jsonb("medical_tents"),
@@ -73,7 +67,7 @@ export const festivalToVendors = relations(festival, ({ many }) => ({
 }));
 
 // Table for the venue address
-export const address: PgTable = pgTable("address", {
+export const address = pgTable("address", {
     id: integer("id").primaryKey(),
     street: varchar("street", { length: CONSTANTS.MAX_ADDRESS_LENGTH }).notNull(),
     city: varchar("city", { length: CONSTANTS.MAX_ADDRESS_LENGTH }).notNull(),
@@ -84,16 +78,14 @@ export const address: PgTable = pgTable("address", {
 });
 
 // Table for the weather at the event
-export const weather: PgTable = pgTable("weather", {
+export const weather = pgTable("weather", {
     id: integer("id").primaryKey(),
-    // @ts-expect-error= Not sure how to parameterize the location table as a generic type of the pgTable type
     locationId: integer("location_id").references(() => weatherResponseLocation.id).notNull(),
-    // @ts-expect-error= Not sure how to parameterize the forecast table as a generic type of the pgTable type
     forecastId: integer("forecast_id").references(() => weatherResponseForecast.id).notNull(),
 });
 
 // Table for the location of the weather response
-export const weatherResponseLocation: PgTable = pgTable("weather_response_location", {
+export const weatherResponseLocation = pgTable("weather_response_location", {
     id: integer("id").primaryKey(),
     name: varchar("name", { length: CONSTANTS.MAX_WEATHER_LOCATION_NAME_LENGTH }).notNull(),
     region: varchar("region", { length: CONSTANTS.MAX_WEATHER_LOCATION_REGION_LENGTH }).notNull(),
@@ -104,7 +96,7 @@ export const weatherResponseLocation: PgTable = pgTable("weather_response_locati
 });
 
 // Table for the forecast of the weather
-export const weatherResponseForecast: PgTable = pgTable("weather_response_forecast", {
+export const weatherResponseForecast = pgTable("weather_response_forecast", {
     id: integer("id").primaryKey(),
     date: timestamp("date").notNull(),
     avgTemp: integer("avg_temp").notNull(),
@@ -117,28 +109,28 @@ export const weatherResponseForecast: PgTable = pgTable("weather_response_foreca
 });
 
 // Table for the temperature at the event
-export const temperature: PgTable = pgTable("temperature", {
+export const temperature = pgTable("temperature", {
     id: integer("id").primaryKey(),
     celsius: integer("celsius"),
     fahrenheit: integer("fahrenheit"),
 });
 
 // Table for the wind of the weather
-export const wind: PgTable = pgTable("wind", {
+export const wind = pgTable("wind", {
     id: integer("id").primaryKey(),
     kilometerPerHour: integer("kph"),
     milesPerHour: integer("mph"),
 })
 
 // Table for the vendors that are going to be in the event.
-export const vendors: PgTable = pgTable("vendors", {
+export const vendors = pgTable("vendors", {
     id: integer("id").primaryKey(),
     name: varchar("name", { length: CONSTANTS.MAX_VENDORS_NAME_LENGTH }).notNull(),
     type: varchar("type", { length: CONSTANTS.MAX_VENDORS_TYPE_LENGTH }).notNull(),
 });
 
 // Table for the users of the application
-export const users: PgTable = pgTable("users", {
+export const users = pgTable("users", {
     id: integer("id").primaryKey(),
     name: varchar("name", { length: CONSTANTS.MAX_USERS_NAME_LENGTH }).notNull(),
     email: varchar("email", { length: CONSTANTS.MAX_USERS_EMAIL_LENGTH }).notNull(),
@@ -148,26 +140,19 @@ export const users: PgTable = pgTable("users", {
 });
 
 export const usersToFestivals = pgTable('users_to_festivals', {
-    // @ts-expect-error - Not sure how to parameterize the users table as a generic type of the pgTable type
     userId: integer('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
-    // @ts-expect-error - Not sure how to parameterize the festival table as a generic type of the pgTable type
     festivalId: integer('festival_id').notNull().references(() => festival.id, { onDelete: 'cascade' }),
 }, (t) => ([
-    primaryKey({ columns: [t.userId, t.festivalId] }), // Composite primary key
-])
-);
+    primaryKey({ columns: [t.userId, t.festivalId] }),
+]));
 
 export const usersRelations = relations(users, ({ many }) => ({
     festivals: many(usersToFestivals),
 }));
 
 export const festivalRelations = relations(festival, ({ one }) => ({
-    // @ts-expect-error - Not sure how to parameterize the venue table as a generic type of the pgTable type
     venue: one(venue, { fields: [festival.venueId], references: [venue.id] }),
-    // @ts-expect-error - Not sure how to parameterize the address table as a generic type of the pgTable type
     address: one(address, { fields: [festival.addressId], references: [address.id] }),
-    // @ts-expect-error - Not sure how to parameterize the weather table as a generic type of the pgTable type
     weather: one(weather, { fields: [festival.weatherId], references: [weather.id] }),
-    // @ts-expect-error - Not sure how to parameterize the users table as a generic type of the pgTable type
-    organizer: one(users, { fields: [festival.userId], references: [users.id] }), // Assuming festival.userId is the organizer
+    organizer: one(users, { fields: [festival.userId], references: [users.id] }),
 }));
