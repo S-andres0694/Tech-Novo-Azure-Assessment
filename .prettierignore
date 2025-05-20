@@ -2,3 +2,4 @@
 build
 coverage
 .env
+app/database/schema.ts
