@@ -1,5 +1,4 @@
 import type { Route } from "./+types/home";
-import { Welcome } from "../welcome/welcome";
 
 // Recommended config by the documentation of React Router.
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -11,5 +10,5 @@ export function meta(_: Route.MetaArgs) {
 }
 
 export default function Home() {
-  return <Welcome />;
+  return <div>Home</div>;
 }

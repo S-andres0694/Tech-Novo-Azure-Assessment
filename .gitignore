@@ -10,3 +10,7 @@ eslint-results.sarif
 
 # Jest
 coverage/
+
+spec.md
+
+.env
