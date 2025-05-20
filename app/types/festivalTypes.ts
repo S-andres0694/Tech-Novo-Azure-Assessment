@@ -3,7 +3,6 @@ import type {
   address,
   festival,
   temperature,
-  toilets,
   vendors,
   venue,
   weather,
@@ -17,7 +16,11 @@ export type Festival = InferSelectModel<typeof festival>;
 export type Venue = InferSelectModel<typeof venue>;
 
 // Bathrooms in the venue.
-export type Toilet = InferSelectModel<typeof toilets>;
+// Bathrooms in the venue.
+export type Toilet = {
+  hasToilet: boolean;
+  type: "porta-potty" | "flush-toilet" | "dedicated-bathroom" | null;
+};
 
 // Address of the venue
 export type Address = InferSelectModel<typeof address>;

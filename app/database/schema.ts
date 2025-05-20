@@ -27,6 +27,7 @@ export const CONSTANTS = {
     MAX_FESTIVAL_DESCRIPTION_LENGTH: 255,
     VALID_SECURITY_LEVELS: [1, 2, 3, 0] as const,
     VENDOR_TYPES: ["food", "drink", "merchandise", "other"] as const,
+    TOILET_TYPES: [] as const,
 } as const;
 
 /*
@@ -58,35 +59,11 @@ export const venue: PgTable = pgTable("venue", {
   // @ts-expect-error - Not sure how to parameterize the address table as a generic type of the pgTable type
   addressId: integer("address_id").references(() => address.id).notNull(),
   capacity: integer("capacity").notNull(),
-  // @ts-expect-error - Not sure how to parameterize the toilets table as a generic type of the pgTable type
-  toiletsId: integer("toilets_id").references(() => toilets.id).notNull(),
-  // @ts-expect-error - Not sure how to parameterize the medical tents table as a generic type of the pgTable type
-  medicalTentsId: integer("medical_tents_id").references(() => medicalTents.id).notNull(),
-  // @ts-expect-error - Not sure how to parameterize the camping areas table as a generic type of the pgTable type
-  campingAreasId: integer("camping_areas_id").references(() => campingAreas.id).notNull(),
+  medicalTents: jsonb("medical_tents"),
+  campingAreas: jsonb("camping_areas"),
+  toilets: jsonb("toilets"),
   security: integer("security").notNull(),
   isOutdoors: boolean("is_outdoors").notNull(),
-});
-
-// Table for the medical tents of the venue
-export const medicalTents: PgTable = pgTable("medical_tents", {
-  id: integer("id").primaryKey(),
-  hasMedicalTent: boolean("has_medical_tent").notNull(),
-  quantity: integer("quantity").notNull(),
-});
-
-// Table for the camping areas of the venue
-export const campingAreas: PgTable = pgTable("camping_areas", {
-  id: integer("id").primaryKey(),
-  hasCampingArea: boolean("has_camping_area"),
-  quantity: integer("quantity"),
-});
-
-// Table for the toilets of the venue
-export const toilets: PgTable = pgTable("toilets", {
-  id: integer("id").primaryKey(),
-  hasToilet: boolean("has_toilet").notNull(),
-  type: varchar("type", { length: CONSTANTS.MAX_BATHROOM_TYPE_LENGTH }).notNull(),
 });
 
 // Table for the venue address
